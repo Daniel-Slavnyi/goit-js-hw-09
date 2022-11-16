@@ -1,28 +1,62 @@
+'use strict';
+
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
+import Notiflix from 'notiflix';
 
-const inputEl = document.querySelector("#datetime-picker"), 
-    btnStart = document.querySelector("[data-start]");
+const refs = {
+  inputEl: document.querySelector('#datetime-picker'),
+  btnStart: document.querySelector('[data-start]'),
+  dataDays: document.querySelectorAll('span.value')
+};
 
-btnStart.disabled = true;
+
+refs.btnStart.disabled = true;
 let deadLineTime = null;
+let intervelId = null;
+
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-      if (selectedDates[0] < Date.now()) {
-          btnStart.disabled = true;
-          alert('Please choose a date in the future');
-          return;
-      }
-      deadLineTime = selectedDates[0].getTime() - Date.now();
-      btnStart.disabled = false;
-      console.log(convertMs(deadLineTime));
+    if (selectedDates[0] < Date.now()) {
+      Notiflix.Notify.failure('Please choose a date in the future');
+      return;
+    }
+
+    refs.btnStart.disabled = false;
+    deadLineTime = selectedDates[0].getTime();
   },
 };
-flatpickr("#datetime-picker", options);
+
+flatpickr(refs.inputEl, options);
+
+const onBtnStartClick = () => {
+  refs.btnStart.disabled = true;
+  refs.inputEl.disabled = true;
+  
+  intervelId = setInterval(() => {
+    const delta = deadLineTime - Date.now();
+    const time = convertMs(delta);
+
+    if (delta < 1000) {
+      clearInterval(intervelId);
+      return;
+    }
+
+    Object.entries(time).forEach(([name, value], idx) => {
+      refs.dataDays[idx].textContent = pad(value);
+    });
+  }, 1000);
+};
+
+refs.btnStart.addEventListener('click', onBtnStartClick);
+
+function pad(value) {
+  return String(value).padStart(2, '0');
+}
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
@@ -43,6 +77,8 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-console.log(convertMs(deadLineTime));
+
+
+
 
 
