@@ -45,14 +45,4 @@ const onFormElSubmit = (e) => {
 formEl.addEventListener('submit', onFormElSubmit);
 
 
-//   for (let i = 1; i <= amount; i++) {
-//   createPromise(i, delay).then(resolve => {
-//     console.log(resolve);
-//   }).catch(reject => {
-//     console.log(reject);
-//   });
-//   delay += step;
-// }
-
-
 
